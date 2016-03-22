@@ -76,14 +76,14 @@ public class TwoTimezoneWatchface extends CanvasWatchFaceService {
         boolean mRegisteredTimeZoneReceiver = false;
 
         Paint mBackgroundPaint;
-        Paint mTextPaint;
+        Paint mTextPaint, mTextPaint2;
 
         boolean mAmbient;
 
-        Time mTime;
+        Time mTime, mTime2;
 
-        float mXOffset;
-        float mYOffset;
+        float mXOffset, mXOffset2;
+        float mYOffset, mYOffset2;
 
         /**
          * Whether the display supports fewer bits for each color in ambient mode. When true, we
@@ -102,6 +102,7 @@ public class TwoTimezoneWatchface extends CanvasWatchFaceService {
                     .build());
             Resources resources = TwoTimezoneWatchface.this.getResources();
             mYOffset = resources.getDimension(R.dimen.digital_y_offset);
+            mYOffset2 = resources.getDimension(R.dimen.two_tz_digital_y_offset2);
 
             mBackgroundPaint = new Paint();
             mBackgroundPaint.setColor(resources.getColor(R.color.digital_background));
@@ -109,7 +110,11 @@ public class TwoTimezoneWatchface extends CanvasWatchFaceService {
             mTextPaint = new Paint();
             mTextPaint = createTextPaint(resources.getColor(R.color.digital_text));
 
+            mTextPaint2 = new Paint();
+            mTextPaint2 = createTextPaint(resources.getColor(R.color.digital_text));
+
             mTime = new Time();
+            mTime2 = new Time("Europe/London");
         }
 
         @Override
@@ -171,10 +176,15 @@ public class TwoTimezoneWatchface extends CanvasWatchFaceService {
             boolean isRound = insets.isRound();
             mXOffset = resources.getDimension(isRound
                     ? R.dimen.digital_x_offset_round : R.dimen.digital_x_offset);
+            mXOffset2 = mXOffset;
+
             float textSize = resources.getDimension(isRound
                     ? R.dimen.digital_text_size_round : R.dimen.digital_text_size);
-
             mTextPaint.setTextSize(textSize);
+
+            float textSize2 = resources.getDimension(isRound
+                    ? R.dimen.two_tz_digital_text_size2_round : R.dimen.two_tz_digital_text_size2);
+            mTextPaint2.setTextSize(textSize2);
         }
 
         @Override
@@ -216,6 +226,10 @@ public class TwoTimezoneWatchface extends CanvasWatchFaceService {
                     ? String.format("%d:%02d", mTime.hour, mTime.minute)
                     : String.format("%d:%02d:%02d", mTime.hour, mTime.minute, mTime.second);
             canvas.drawText(text, mXOffset, mYOffset, mTextPaint);
+
+            mTime2.setToNow();
+            text = String.format("%d:%02d", mTime2.hour, mTime2.minute);
+            canvas.drawText(text, mXOffset2, mYOffset2, mTextPaint2);
         }
 
         /**
