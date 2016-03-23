@@ -62,7 +62,7 @@ public class TwoTimezoneWatchface extends CanvasWatchFaceService {
         return new Engine();
     }
 
-    private class Engine extends CanvasWatchFaceService.Engine {
+    /* protected */ class Engine extends CanvasWatchFaceService.Engine {
         final Handler mUpdateTimeHandler = new EngineHandler(this);
 
         final BroadcastReceiver mTimeZoneReceiver = new BroadcastReceiver() {
@@ -102,7 +102,6 @@ public class TwoTimezoneWatchface extends CanvasWatchFaceService {
                     .build());
             Resources resources = TwoTimezoneWatchface.this.getResources();
             mYOffset = resources.getDimension(R.dimen.digital_y_offset);
-            mYOffset2 = resources.getDimension(R.dimen.two_tz_digital_y_offset2);
 
             mBackgroundPaint = new Paint();
             mBackgroundPaint.setColor(resources.getColor(R.color.digital_background));
@@ -123,7 +122,7 @@ public class TwoTimezoneWatchface extends CanvasWatchFaceService {
             super.onDestroy();
         }
 
-        private Paint createTextPaint(int textColor) {
+        /* protected */ Paint createTextPaint(int textColor) {
             Paint paint = new Paint();
             paint.setColor(textColor);
             paint.setTypeface(NORMAL_TYPEFACE);
@@ -174,10 +173,6 @@ public class TwoTimezoneWatchface extends CanvasWatchFaceService {
             // Load resources that have alternate values for round watches.
             Resources resources = TwoTimezoneWatchface.this.getResources();
             boolean isRound = insets.isRound();
-            mXOffset = resources.getDimension(isRound
-                    ? R.dimen.digital_x_offset_round : R.dimen.digital_x_offset);
-            mXOffset2 = mXOffset;
-
             float textSize = resources.getDimension(isRound
                     ? R.dimen.digital_text_size_round : R.dimen.digital_text_size);
             mTextPaint.setTextSize(textSize);
@@ -185,6 +180,20 @@ public class TwoTimezoneWatchface extends CanvasWatchFaceService {
             float textSize2 = resources.getDimension(isRound
                     ? R.dimen.two_tz_digital_text_size2_round : R.dimen.two_tz_digital_text_size2);
             mTextPaint2.setTextSize(textSize2);
+
+
+            // set x offset for text 1 and text 2
+            mXOffset = resources.getDimension(isRound
+                    ? R.dimen.digital_x_offset_round : R.dimen.digital_x_offset);
+            mXOffset2 = mXOffset;
+
+
+            // set y offset for text 2 dynamically
+            String sampleText1 = "00:00:00";
+            Rect text1Bounds = new Rect();
+            mTextPaint.getTextBounds(sampleText1, 0, sampleText1.length(), text1Bounds);
+            mYOffset2 = mYOffset + text1Bounds.height()
+                    + resources.getDimension(R.dimen.margin_vertical);
         }
 
         @Override
@@ -222,14 +231,24 @@ public class TwoTimezoneWatchface extends CanvasWatchFaceService {
 
             // Draw H:MM in ambient mode or H:MM:SS in interactive mode.
             mTime.setToNow();
-            String text = mAmbient
-                    ? String.format("%d:%02d", mTime.hour, mTime.minute)
-                    : String.format("%d:%02d:%02d", mTime.hour, mTime.minute, mTime.second);
+            String text = getText(mTime);
             canvas.drawText(text, mXOffset, mYOffset, mTextPaint);
 
-            mTime2.setToNow();
-            text = String.format("%d:%02d", mTime2.hour, mTime2.minute);
-            canvas.drawText(text, mXOffset2, mYOffset2, mTextPaint2);
+            if (!mAmbient) {
+                mTime2.setToNow();
+                text = getText2(mTime2);
+                canvas.drawText(text, mXOffset2, mYOffset2, mTextPaint2);
+            }
+        }
+
+        /* protected */ String getText(Time time) {
+            return mAmbient
+                    ? String.format("%d:%02d", time.hour, time.minute)
+                    : String.format("%d:%02d:%02d", time.hour, time.minute, time.second);
+        }
+
+        /* protected */ String getText2(Time time) {
+            return String.format("%d:%02d", time.hour, time.minute);
         }
 
         /**
@@ -265,7 +284,7 @@ public class TwoTimezoneWatchface extends CanvasWatchFaceService {
         }
     }
 
-    private static class EngineHandler extends Handler {
+    /* protected */ static class EngineHandler extends Handler {
         private final WeakReference<TwoTimezoneWatchface.Engine> mWeakReference;
 
         public EngineHandler(TwoTimezoneWatchface.Engine reference) {

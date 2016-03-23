@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">TwoThreeTimezonesWatchface</string>
     <string name="two_timezones">2TZ</string>
+    <string name="three_timezones">3TZ</string>
 </resources>
