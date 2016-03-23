@@ -2,4 +2,8 @@
     <string name="app_name">TwoThreeTimezonesWatchface</string>
     <string name="two_timezones">2TZ</string>
     <string name="three_timezones">3TZ</string>
+    <string name="title_activity_unified_config">UnifiedConfigActivity</string>
+    <string name="title_activity_time_zone_chooser">TimeZoneChooserActivity</string>
+
+    <string name="device_timezone">Device timezone</string>
 </resources>

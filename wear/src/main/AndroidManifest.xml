@@ -27,6 +27,10 @@
             <meta-data
                 android:name="com.google.android.wearable.watchface.preview_circular"
                 android:resource="@drawable/preview_digital_circular" />
+            <!-- wearable configuration activity -->
+            <meta-data
+                android:name="com.google.android.wearable.watchface.wearableConfigurationAction"
+                android:value="com.erictang.twothreetimezoneswatchface.CONFIG_UNIFIED" />
 
             <intent-filter>
                 <action android:name="android.service.wallpaper.WallpaperService" />
@@ -34,7 +38,6 @@
                 <category android:name="com.google.android.wearable.watchface.category.WATCH_FACE" />
             </intent-filter>
         </service>
-
         <service
             android:name=".ThreeTimezoneWatchface"
             android:label="@string/three_timezones"
@@ -48,6 +51,10 @@
             <meta-data
                 android:name="com.google.android.wearable.watchface.preview_circular"
                 android:resource="@drawable/preview_digital_circular" />
+            <!-- wearable configuration activity -->
+            <meta-data
+                android:name="com.google.android.wearable.watchface.wearableConfigurationAction"
+                android:value="com.erictang.twothreetimezoneswatchface.CONFIG_UNIFIED" />
 
             <intent-filter>
                 <action android:name="android.service.wallpaper.WallpaperService" />
@@ -59,6 +66,21 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+
+        <activity
+            android:name=".UnifiedConfigActivity"
+            android:label="@string/title_activity_unified_config" >
+            <intent-filter>
+                <action android:name="com.erictang.twothreetimezoneswatchface.CONFIG_UNIFIED" />
+
+                <category android:name="com.google.android.wearable.watchface.category.WEARABLE_CONFIGURATION" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".TimeZoneChooserActivity"
+            android:label="@string/title_activity_time_zone_chooser" >
+        </activity>
     </application>
 
 </manifest>

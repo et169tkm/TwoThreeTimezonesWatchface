@@ -1,0 +1,13 @@
+<android.support.wearable.view.BoxInsetLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/config_unified_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <android.support.wearable.view.WearableListView
+        android:id="@+id/list_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"
+        app:layout_box="left|right"/>
+</android.support.wearable.view.BoxInsetLayout>
