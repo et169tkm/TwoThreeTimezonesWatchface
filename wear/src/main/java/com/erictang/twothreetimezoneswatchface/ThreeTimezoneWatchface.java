@@ -30,6 +30,8 @@ import java.util.Date;
  * low-bit ambient mode, the text is drawn without anti-aliasing in ambient mode.
  */
 public class ThreeTimezoneWatchface extends TwoTimezoneWatchface {
+    /* protected */static final long TIME3_FADE_IN_TIME = 300;
+    /* protected */ static final long TIME3_FADE_IN_DURATION = TIME2_FADE_IN_DURATION;
 
     @Override
     public Engine onCreateEngine() {
@@ -64,10 +66,11 @@ public class ThreeTimezoneWatchface extends TwoTimezoneWatchface {
             super.onDraw(canvas, bounds);
             if (!mAmbient) {
                 long dT = new Date().getTime() - mLastAmbientInteractiveTransitionTime;
-                if (dT < 400) {
+                if (dT < TIME3_FADE_IN_TIME) {
                     mTextPaint3.setAlpha(0);
-                } else if (dT < 800) {
-                    mTextPaint3.setAlpha((int)(255*(dT - 400)/400));
+                } else if (dT < TIME3_FADE_IN_TIME + TIME3_FADE_IN_DURATION) {
+                    mTextPaint3.setAlpha((int)(255*(dT-TIME3_FADE_IN_TIME)/TIME3_FADE_IN_DURATION));
+                    postInvalidate();
                 } else {
                     mTextPaint3.setAlpha(255);
                 }
@@ -87,6 +90,11 @@ public class ThreeTimezoneWatchface extends TwoTimezoneWatchface {
                 }
                 canvas.drawText(text3, mXOffset3, mYOffset3, mTextPaint3);
             }
+        }
+
+        @Override
+        boolean isAmbientToInteractiveAnimationFinished(long dT) {
+            return (dT > TIME3_FADE_IN_TIME + TIME3_FADE_IN_DURATION);
         }
 
         @Override

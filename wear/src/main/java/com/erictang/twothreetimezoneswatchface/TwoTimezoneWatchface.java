@@ -44,6 +44,7 @@ import java.util.concurrent.TimeUnit;
  * low-bit ambient mode, the text is drawn without anti-aliasing in ambient mode.
  */
 public class TwoTimezoneWatchface extends CanvasWatchFaceService {
+    /* protected */ static final long TIME2_FADE_IN_DURATION = 400;
     private static final Typeface NORMAL_TYPEFACE =
             Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
 
@@ -260,16 +261,27 @@ public class TwoTimezoneWatchface extends CanvasWatchFaceService {
             canvas.drawText(text, mXOffset, mYOffset, mTextPaint);
 
             if (!mAmbient) {
-                if (dT > 400) {
+                if (dT > TIME2_FADE_IN_DURATION) {
                     mTextPaint2.setAlpha(255); // full
                 } else {
-                    mTextPaint2.setAlpha((int)(255*dT/400));
+                    mTextPaint2.setAlpha((int)(255*dT/TIME2_FADE_IN_DURATION));
                 }
 
                 mTime2.setToNow();
                 text = getText2(mTime2);
                 canvas.drawText(text, mXOffset2, mYOffset2, mTextPaint2);
+
+                if (!isAmbientToInteractiveAnimationFinished(dT)) {
+                    postInvalidate();
+                }
             }
+        }
+
+        /**
+         * @param dT amount of time from the ambient-to-interaction transition till now
+         */
+        boolean isAmbientToInteractiveAnimationFinished(long dT) {
+            return (dT > TIME2_FADE_IN_DURATION);
         }
 
         /* protected */ String getText(Time time) {
