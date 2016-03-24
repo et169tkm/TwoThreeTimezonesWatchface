@@ -46,7 +46,6 @@ public class ThreeTimezoneWatchface extends TwoTimezoneWatchface {
         public void onCreate(SurfaceHolder holder) {
             super.onCreate(holder);
 
-            mTime3 = new Time("Asia/Hong_Kong");
             mTextPaint3 = mTextPaint2;
             mMinHorzintalMargin = getResources().getDimension(R.dimen.margin_horizontal_min);
         }
@@ -76,6 +75,13 @@ public class ThreeTimezoneWatchface extends TwoTimezoneWatchface {
                 }
                 canvas.drawText(text3, mXOffset3, mYOffset3, mTextPaint3);
             }
+        }
+
+        @Override
+        void setTimezone() {
+            super.setTimezone();
+
+            mTime3 = getTimeWithTimezoneID(ConfigUtil.getTimezoneId(ThreeTimezoneWatchface.this, 2));
         }
     }
 }

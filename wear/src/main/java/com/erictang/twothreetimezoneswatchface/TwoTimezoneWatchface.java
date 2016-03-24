@@ -75,6 +75,8 @@ public class TwoTimezoneWatchface extends CanvasWatchFaceService {
 
         boolean mRegisteredTimeZoneReceiver = false;
 
+        BroadcastReceiver mTimezoneConfigUpdateReceiver;
+
         Paint mBackgroundPaint;
         Paint mTextPaint, mTextPaint2;
 
@@ -112,14 +114,28 @@ public class TwoTimezoneWatchface extends CanvasWatchFaceService {
             mTextPaint2 = new Paint();
             mTextPaint2 = createTextPaint(resources.getColor(R.color.digital_text));
 
-            mTime = new Time();
-            mTime2 = new Time("Europe/London");
+            setTimezone();
+
+            mTimezoneConfigUpdateReceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    setTimezone();
+                }
+            };
+            TwoTimezoneWatchface.this.registerReceiver(mTimezoneConfigUpdateReceiver,
+                    new IntentFilter(ConfigUtil.ACTION_TIMEZONE_UPDATED));
         }
 
         @Override
         public void onDestroy() {
             mUpdateTimeHandler.removeMessages(MSG_UPDATE_TIME);
+            TwoTimezoneWatchface.this.unregisterReceiver(mTimezoneConfigUpdateReceiver);
             super.onDestroy();
+        }
+
+        /* protected */ void setTimezone() {
+            mTime = getTimeWithTimezoneID(ConfigUtil.getTimezoneId(TwoTimezoneWatchface.this, 0));
+            mTime2 = getTimeWithTimezoneID(ConfigUtil.getTimezoneId(TwoTimezoneWatchface.this, 1));
         }
 
         /* protected */ Paint createTextPaint(int textColor) {
@@ -135,13 +151,13 @@ public class TwoTimezoneWatchface extends CanvasWatchFaceService {
             super.onVisibilityChanged(visible);
 
             if (visible) {
-                registerReceiver();
+                registerTimezoneReceiver();
 
                 // Update time zone in case it changed while we weren't visible.
                 mTime.clear(TimeZone.getDefault().getID());
                 mTime.setToNow();
             } else {
-                unregisterReceiver();
+                unregisterTimezoneReceiver();
             }
 
             // Whether the timer should be running depends on whether we're visible (as well as
@@ -149,7 +165,7 @@ public class TwoTimezoneWatchface extends CanvasWatchFaceService {
             updateTimer();
         }
 
-        private void registerReceiver() {
+        private void registerTimezoneReceiver() {
             if (mRegisteredTimeZoneReceiver) {
                 return;
             }
@@ -158,7 +174,7 @@ public class TwoTimezoneWatchface extends CanvasWatchFaceService {
             TwoTimezoneWatchface.this.registerReceiver(mTimeZoneReceiver, filter);
         }
 
-        private void unregisterReceiver() {
+        private void unregisterTimezoneReceiver() {
             if (!mRegisteredTimeZoneReceiver) {
                 return;
             }
@@ -301,6 +317,14 @@ public class TwoTimezoneWatchface extends CanvasWatchFaceService {
                         break;
                 }
             }
+        }
+    }
+
+    public static Time getTimeWithTimezoneID(String tzid) {
+        if (tzid != null && TimeZone.getTimeZone(tzid) != null) {
+            return new Time(tzid);
+        } else {
+            return new Time();
         }
     }
 }
