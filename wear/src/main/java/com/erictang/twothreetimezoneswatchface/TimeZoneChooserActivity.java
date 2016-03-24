@@ -1,9 +1,10 @@
 package com.erictang.twothreetimezoneswatchface;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.app.Activity;
 import android.support.wearable.view.WearableListView;
+import android.text.TextUtils;
 import android.view.ViewGroup;
 
 import java.util.TimeZone;
@@ -47,8 +48,15 @@ public class TimeZoneChooserActivity extends Activity implements WearableListVie
         listView.setHasFixedSize(true);
         listView.setClickListener(this);
         listView.setAdapter(new TimeZoneChooserAdapter());
-    }
 
+        String chosenTzid = getIntent().getStringExtra(EXTRA_CHOSEN_TIMEZONE);
+        for (int i = 0; i < tzids.length; i++) {
+            if (TextUtils.equals(tzids[i], chosenTzid)) {
+                listView.scrollToPosition(i+1);
+                break;
+            }
+        }
+    }
 
     //// BEGIN WearableListView.ClickListener
     @Override

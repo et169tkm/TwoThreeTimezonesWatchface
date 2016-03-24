@@ -80,7 +80,9 @@ public class UnifiedConfigActivity extends Activity implements WearableListView.
     //// BEGIN WearableListView.ClickListener
     @Override
     public void onClick(WearableListView.ViewHolder viewHolder) {
+        String tzid = ConfigUtil.getTimezoneId(this, viewHolder.getPosition());
         Intent intent = new Intent(this, TimeZoneChooserActivity.class);
+        intent.putExtra(TimeZoneChooserActivity.EXTRA_CHOSEN_TIMEZONE, tzid);
         startActivityForResult(intent, viewHolder.getPosition());
     }
 
