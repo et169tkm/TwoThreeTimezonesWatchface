@@ -46,15 +46,8 @@ public class UnifiedConfigActivity extends Activity implements WearableListView.
         }
     }
 
-    class TimeZoneUpdatedReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            UnifiedConfigActivity.this.timezoneUpdated();
-        }
-    }
-
     UnifiedConfigSettingsAdapter mAdapter;
-    TimeZoneUpdatedReceiver mTimeZoneUpdatedReceiver;
+    BroadcastReceiver mTimeZoneUpdatedReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +59,12 @@ public class UnifiedConfigActivity extends Activity implements WearableListView.
         mAdapter = new UnifiedConfigSettingsAdapter();
         listView.setAdapter(mAdapter);
 
-        mTimeZoneUpdatedReceiver = new TimeZoneUpdatedReceiver();
+        mTimeZoneUpdatedReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                UnifiedConfigActivity.this.timezoneUpdated();
+            }
+        };
         IntentFilter intentFilter = new IntentFilter(ConfigUtil.ACTION_TIMEZONE_UPDATED);
         registerReceiver(mTimeZoneUpdatedReceiver, intentFilter);
     }
