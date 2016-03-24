@@ -23,6 +23,8 @@ import android.text.format.Time;
 import android.view.SurfaceHolder;
 import android.view.WindowInsets;
 
+import java.util.Date;
+
 /**
  * Digital watch face with seconds. In ambient mode, the seconds aren't displayed. On devices with
  * low-bit ambient mode, the text is drawn without anti-aliasing in ambient mode.
@@ -46,13 +48,14 @@ public class ThreeTimezoneWatchface extends TwoTimezoneWatchface {
         public void onCreate(SurfaceHolder holder) {
             super.onCreate(holder);
 
-            mTextPaint3 = mTextPaint2;
+            mTextPaint3 = new Paint(mTextPaint2);
             mMinHorzintalMargin = getResources().getDimension(R.dimen.margin_horizontal_min);
         }
 
         @Override
         public void onApplyWindowInsets(WindowInsets insets) {
             super.onApplyWindowInsets(insets);
+            mTextPaint3.setTextSize(mTextPaint2.getTextSize());
             mYOffset3 = mYOffset2;
         }
 
@@ -60,6 +63,15 @@ public class ThreeTimezoneWatchface extends TwoTimezoneWatchface {
         public void onDraw(Canvas canvas, Rect bounds) {
             super.onDraw(canvas, bounds);
             if (!mAmbient) {
+                long dT = new Date().getTime() - mLastAmbientInteractiveTransitionTime;
+                if (dT < 400) {
+                    mTextPaint3.setAlpha(0);
+                } else if (dT < 800) {
+                    mTextPaint3.setAlpha((int)(255*(dT - 400)/400));
+                } else {
+                    mTextPaint3.setAlpha(255);
+                }
+
                 String text = getText(mTime);
 
                 mTime3.setToNow();

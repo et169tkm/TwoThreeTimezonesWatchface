@@ -35,6 +35,7 @@ import android.view.SurfaceHolder;
 import android.view.WindowInsets;
 
 import java.lang.ref.WeakReference;
+import java.util.Date;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
@@ -86,6 +87,8 @@ public class TwoTimezoneWatchface extends CanvasWatchFaceService {
 
         float mXOffset, mXOffset2;
         float mYOffset, mYOffset2;
+
+        long mLastAmbientInteractiveTransitionTime;
 
         /**
          * Whether the display supports fewer bits for each color in ambient mode. When true, we
@@ -233,6 +236,10 @@ public class TwoTimezoneWatchface extends CanvasWatchFaceService {
                     mTextPaint.setAntiAlias(!inAmbientMode);
                 }
                 invalidate();
+
+                if (!inAmbientMode) { // from ambient to interactive
+                    onBecomeInteractive();
+                }
             }
 
             // Whether the timer should be running depends on whether we're visible (as well as
@@ -242,6 +249,8 @@ public class TwoTimezoneWatchface extends CanvasWatchFaceService {
 
         @Override
         public void onDraw(Canvas canvas, Rect bounds) {
+            long dT = new Date().getTime() - mLastAmbientInteractiveTransitionTime;
+
             // Draw the background.
             canvas.drawRect(0, 0, bounds.width(), bounds.height(), mBackgroundPaint);
 
@@ -251,6 +260,12 @@ public class TwoTimezoneWatchface extends CanvasWatchFaceService {
             canvas.drawText(text, mXOffset, mYOffset, mTextPaint);
 
             if (!mAmbient) {
+                if (dT > 400) {
+                    mTextPaint2.setAlpha(255); // full
+                } else {
+                    mTextPaint2.setAlpha((int)(255*dT/400));
+                }
+
                 mTime2.setToNow();
                 text = getText2(mTime2);
                 canvas.drawText(text, mXOffset2, mYOffset2, mTextPaint2);
@@ -297,6 +312,10 @@ public class TwoTimezoneWatchface extends CanvasWatchFaceService {
                         - (timeMs % INTERACTIVE_UPDATE_RATE_MS);
                 mUpdateTimeHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, delayMs);
             }
+        }
+
+        /* protected */ void onBecomeInteractive() {
+            mLastAmbientInteractiveTransitionTime = new Date().getTime();
         }
     }
 
